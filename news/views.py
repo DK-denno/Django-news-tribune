@@ -1,22 +1,11 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,Http404
 import datetime as dt
+from .models import Article,tags,Editor
 
 # Create your views here.
 def welcome(response):
     return render(response,'welcome.html')
-def news_of_day(request):
-    today = dt.date.today()
-    day = convertdates(today)
-    html = f'''     
-    <html>
-            <body>
-           <h1>   <b> this is news for  {day} the <b>
-               {today.day}th of {today.month} year {today.year}</h1>
-            </body>
-        </html>
-            '''
-    return HttpResponse(html)
 
 def convertdates(today):
     '''
@@ -30,31 +19,40 @@ def convertdates(today):
     day = days[daye]
     return day
 def archives(request,past_date):
-    '''
-    converting data from the string url
-    '''
-    today = dt.datetime.strptime(past_date,'%Y-%m-%d').date()
 
-    day = convertdates(today)
-    html = f'''
-        <html>
-            <body>
-           <h1>   <b> this is news for  {day} the <b>
-               {today.day}th of {today.month} year {today.year}</h1>
-            </body>
-        </html>
-        '''
     try:
-        # Converts data from the string Url
-        date = dt.datetime.strptime(past_date,'%Y-%m-%d').date()
-
+        date = dt.datetime.strptime(past_date,"%Y-%m-%d").date()
     except ValueError:
-        # Raise 404 error when ValueError is thrown
+        #raise valueError
         raise Http404()
-    if today == dt.date.today():
+
+    if date == dt.datetime.today():
         return redirect(news_of_day)
-    return render(request,'all-news/past.html' ,{"dennis":today},)
+
+    news = Article.days_news(date)
+
+    return render(request,'all-news/past.html',{"news":news,"dennis":date})
+
 
 def news_of_day(request):
-    balling = dt.date.today()
-    return render(request,'all-news/today.html',{"dennis":balling,})
+    date = dt.datetime.today()
+    news = Article.todays_news()
+    return render(request,'all-news/today.html',{"dennis":date,'news':news})
+
+def search_results(request):
+    if 'article' in request.GET or request.GET['article']:
+        search_item = request.GET.get('article')
+        searched_articles = Article.search_by_title(search_item)
+        print(searched_articles)
+        message = f"{search_item}"
+        return render(request, 'all-news/search.html',{"message":message,"articles": searched_articles})
+    else:
+        message = "You haven't searched for any term"
+        return render(request, 'all-news/search.html',{"message":message})
+
+def article(request,article_id):
+    try:
+        article = Article.objects.get(id = article_id)
+    except DoesNotExist:
+        raise Http404()
+    return render(request,"all-news/article.html", {"article":article}) 

@@ -1,6 +1,33 @@
-{% extends 'all-news/base.html' %}
-{% block content %}
-<h1>rada</h1>
-{{block.super}}
+{%extends 'all-news/base.html'%}
+{% block content %} 
+{{ block.super}}
+
+<div class="container">
+
+  <!-- Looping through news   -->
+  {% for news_item in news %}
+{{news_item.id}}
+  <div class="row">
+    <!-- displaying News articles -->
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+      <h2 class="text-center"> {{ news_item.title }} </h2>
+      <button><a href="/article/{{news_item.id}}">SEE FULL ARTICLE</a></button>
+      <h3>{{news_item.post}}</h3>
+    </div>
+     <!--Display news Article images  -->
+     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <img src="{{news_item.article_image.url}}" class="img-responsive" alt="Image">
+      </div>
+    
+
+  </div>
+
+  {% empty %}
+  <div class="row">
+    <h2 class="text-center">There No News Items</h2>
+  </div>
+  {% endfor %}
+
+</div>
 
 {% endblock %}
