@@ -1,12 +1,13 @@
 {%extends 'all-news/base.html'%}
-{% block content %} 
+{% block content %}
+{% load bootstrap3 %}
 {{ block.super}}
 
 <div class="container">
 
   <!-- Looping through news   -->
   {% for news_item in news %}
-{{news_item.id}}
+  {{news_item.id}}
   <div class="row">
     <!-- displaying News articles -->
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -14,11 +15,12 @@
       <button><a href="/article/{{news_item.id}}">SEE FULL ARTICLE</a></button>
       <h3>{{news_item.post}}</h3>
     </div>
-     <!--Display news Article images  -->
-     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <img src="{{news_item.article_image.url}}" class="img-responsive" alt="Image">
-      </div>
-    
+    <!--Display news Article images  -->
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+      <img src="{{news_item.article_image.url}}" class="img-responsive" alt="Image">
+    </div>
+
+
 
   </div>
 
@@ -27,7 +29,16 @@
     <h2 class="text-center">There No News Items</h2>
   </div>
   {% endfor %}
+  <div style="padding:20px;"></div>
+  <div class="container-fluid">
 
-</div>
+    <form action="{%url 'news_of_day'%}" method="POST">
+      {%csrf_token%}
 
-{% endblock %}
+      {% bootstrap_form letterForm layout='inline' %}
+      <input type="submit" value="Subscribe">
+    </form>
+
+  </div>
+
+  {% endblock %}

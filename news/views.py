@@ -1,7 +1,9 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse,Http404
+from django.http import HttpResponse,Http404,HttpResponseRedirect
 import datetime as dt
-from .models import Article,tags,Editor
+from .models import Article,tags,Editor,NewsLetterRecipients
+from .forms import NewsLetter
+from .email import welcome_email
 
 # Create your views here.
 def welcome(response):
@@ -37,8 +39,20 @@ def archives(request,past_date):
 def news_of_day(request):
     date = dt.datetime.today()
     news = Article.todays_news()
-    return render(request,'all-news/today.html',{"dennis":date,'news':news})
-
+    if request.method == 'POST':
+        form = NewsLetter(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['your_name']
+            email = form.cleaned_data['email']
+            recipient = NewsLetterRecipients(name=name,email=email)
+            recipient.save()
+            welcome_email(name,email)
+            HttpResponseRedirect('news_of_day')
+            print('valid')
+    else:
+        form = NewsLetter()
+    return render(request, 'all-news/today.html', {"date": date,"news":news,"letterForm":form})
+    
 def search_results(request):
     if 'article' in request.GET or request.GET['article']:
         search_item = request.GET.get('article')

@@ -7,7 +7,7 @@ from . import views
 
 
 urlpatterns=[
-    url(r'^$',views.news_of_day,name='newsToday'),
+    url(r'^$',views.news_of_day,name='news_of_day'),
     url(r'^search',views.search_results,name='search_results'),
     url(r'^archives/(\d{4}-\d{2}-\d{2})/$',views.archives,name = 'pastNews'),
      url(r'^article/(\d+)',views.article,name ='article')
